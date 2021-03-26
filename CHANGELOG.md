@@ -5,6 +5,109 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ❤️ **Donate:** Enjoying MagicMirror²? [Please consider a donation!](https://magicmirror.builders/donate) With your help we can continue to improve the MagicMirror²
 
+## [2.14.0] - 2021-01-01
+
+Special thanks to the following contributors: @Alvinger, @AndyPoms, @ashishtank, @bluemanos, @flopp999, @jakemulley, @jakobsarwary1, @marvai-vgtu, @mirontoli, @rejas, @sdetweil, @Snille & @Sub028.
+
+ℹ️ **Note:** This update uses new dependencies. Please update using the following command: `git pull && npm install`.
+
+### Added
+
+- Added new log level "debug" to the logger.
+- Added new parameter "useKmh" to weather module for displaying wind speed as kmh.
+- Chuvash translation.
+- Added Weatherbit as a provider to Weather module.
+- Added SMHI as a provider to Weather module.
+- Added Hindi & Gujarati translation.
+- Added optional support for DEGREE position in Feels like translation.
+- Added support for variables in nunjucks templates for translate filter.
+- Added Chuvash translation.
+- Calendar: new options "limitDays" and "coloredEvents".
+- Added new option "limitDays" - limit the number of discreet days displayed.
+- Added new option "customEvents" - use custom symbol/color based on keyword in event title.
+- Added GitHub workflows for automated testing and changelog enforcement.
+
+### Updated
+
+- Merging .gitignore in the config-folder with the .gitignore in the root-folder.
+- Weather module - forecast now show TODAY and TOMORROW instead of weekday, to make it easier to understand.
+- Update dependencies to latest versions.
+- Update dependencies eslint, feedme, simple-git and socket.io to latest versions.
+- Update lithuanian translation.
+- Update config sample.
+- Highlight required version mismatch.
+- No select Text for TouchScreen use.
+- Corrected logic for timeFormat "relative" and "absolute".
+- Added missing function call in module.show()
+- Translator variables can have falsy values (e.g. empty string)
+- Fix issue with weather module with DEGREE label in FEELS like
+
+### Deleted
+
+- Removed Travis CI intergration.
+
+### Fixed
+
+- JSON Parse translation files with comments crashing UI. (#2149)
+- Calendar parsing where RRULE bug returns wrong date, add Windows timezone name support. (#2145, #2151)
+- Wrong node-ical version installed (package.json) requested version. (#2153)
+- Fix calendar fetcher subsequent timing. (#2160)
+- Rename Greek translation to correct ISO 639-1 alpha-2 code (gr > el). (#2155)
+- Add a space after icons of sunrise and sunset. (#2169)
+- Fix calendar when no DTEND record found in event, startDate overlay when endDate set. (#2177)
+- Fix windspeed convertion error in ukmetoffice weather provider. (#2189)
+- Fix console.debug not having timestamps. (#2199)
+- Fix calendar full day event east of UTC start time. (#2200)
+- Fix non-fullday recurring rule processing. (#2216)
+- Catch errors when parsing calendar data with ical. (#2022)
+- Fix Default Alert Module does not hide black overlay when alert is dismissed manually. (#2228)
+- Weather module - Always displays night icons when local is other then English. (#2221)
+- Update Node-ical 0.12.4 , fix invalid RRULE format in cal entries
+- Fix package.json for optional electron dependency (2378)
+- Update node-ical version again, 0.12.5, change RRULE fix (#2371, #2379)
+- Remove undefined objects from modules array (#2382)
+- Update node-ical version again, 0.12.7, change RRULE fix (#2371, #2379), node-ical now throws error (which we catch)
+- Update simple-git version to 2.31 unhandled promise rejection (#2383)
+
+## [2.13.0] - 2020-10-01
+
+Special thanks to the following contributors: @bryanzzhu, @bugsounet, @chamakura, @cjbrunner, @easyas314, @larryare, @oemel09, @rejas, @sdetweil & @sthuber90.
+
+ℹ️ **Note:** This update uses new dependencies. Please update using the following command: `git pull && npm install`.
+
+### Added
+
+- `--dry-run` option adde in fetch call within updatenotification node_helper. This is to prevent
+  MagicMirror from consuming any fetch result. Causes conflict with MMPM when attempting to check
+  for updates to MagicMirror and/or MagicMirror modules.
+- Test coverage with Istanbul, run it with `npm run test:coverage`.
+- Add lithuanian language.
+- Added support in weatherforecast for OpenWeather onecall API.
+- Added config option to calendar-icons for recurring- and fullday-events.
+- Added current, hourly (max 48), and daily (max 7) weather forecasts to weather module via OpenWeatherMap One Call API.
+- Added eslint-plugin for jsdoc comments.
+- Added new configDeepMerge option for module developers.
+
+### Updated
+
+- Change incorrect weather.js default properties.
+- Cleaned up newsfeed module.
+- Cleaned up jsdoc comments.
+- Cleaned up clock tests.
+- Move lodash into devDependencies, update other dependencies.
+- Switch from ical to node-ical library.
+
+### Fixed
+
+- Fix backward compatibility issues for Safari < 11.
+- Fix the use of "maxNumberOfDays" in the module "weatherforecast depending on the endpoint (forecast/daily or forecast)". [#2018](https://github.com/MichMich/MagicMirror/issues/2018)
+- Fix calendar display. Account for current timezone. [#2068](https://github.com/MichMich/MagicMirror/issues/2068)
+- Fix logLevel being set before loading config.
+- Fix incorrect namespace links in svg clockfaces. [#2072](https://github.com/MichMich/MagicMirror/issues/2072)
+- Fix weather/providers/weathergov for API guidelines. [#2045](https://github.com/MichMich/MagicMirror/issues/2045)
+- Fix "undefined" in weather modules header. [#1985](https://github.com/MichMich/MagicMirror/issues/1985)
+- Fix #2110, #2111, #2118: Recurring full day events should not use timezone adjustment. Just compare month/day.
+
 ## [2.12.0] - 2020-07-01
 
 Special thanks to the following contributors: @AndreKoepke, @andrezibaia, @bryanzzhu, @chamakura, @DarthBrento, @Ekristoffe, @khassel, @Legion2, @ndom91, @radokristof, @rejas, @XBCreepinJesus & @ZoneMR.
@@ -43,6 +146,7 @@ Special thanks to the following contributors: @AndreKoepke, @andrezibaia, @bryan
 - Throw error when check_config fails. [#1928](https://github.com/MichMich/MagicMirror/issues/1928)
 - Bug fix related to 'maxEntries' not displaying Calendar events. [#2050](https://github.com/MichMich/MagicMirror/issues/2050)
 - Updated ical library to latest version. [#1926](https://github.com/MichMich/MagicMirror/issues/1926)
+- Fix config check after merge of prettier [#2109](https://github.com/MichMich/MagicMirror/issues/2109)
 
 ## [2.11.0] - 2020-04-01
 
@@ -95,6 +199,7 @@ For more information regarding this major change, please check issue [#1860](htt
 - Timestamp in log output now also contains the date
 - Turkish translation.
 - Option to configure the size of the currentweather module.
+- Changed "Gevoelstemperatuur" to "Voelt als" shorter text.
 
 ## [2.10.1] - 2020-01-10
 

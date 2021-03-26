@@ -11,16 +11,15 @@ Module.register("weather", {
 	defaults: {
 		weatherProvider: "openweathermap",
 		roundTemp: false,
-		type: "current", //current, forecast
-
+		type: "current", // current, forecast, daily (equivalent to forecast), hourly (only with OpenWeatherMap /onecall endpoint)
+		lat: 0,
+		lon: 0,
 		location: false,
 		locationID: false,
-		appid: "",
 		units: config.units,
-
+		useKmh: false,
 		tempUnits: config.units,
 		windUnits: config.units,
-
 		updateInterval: 10 * 60 * 1000, // every 10 minutes
 		animationSpeed: 1000,
 		timeFormat: config.timeFormat,
@@ -37,24 +36,24 @@ Module.register("weather", {
 		showIndoorTemperature: false,
 		showIndoorHumidity: false,
 		maxNumberOfDays: 5,
+		maxEntries: 5,
 		fade: true,
 		fadePoint: 0.25, // Start on 1/4th of the list.
-
 		initialLoadDelay: 0, // 0 seconds delay
 		retryDelay: 2500,
-
+		apiKey: "",
+		apiSecret: "",
 		apiVersion: "2.5",
-		apiBase: "https://api.openweathermap.org/data/",
+		apiBase: "https://api.openweathermap.org/data/", // TODO: this should not be part of the weather.js file, but should be contained in the openweatherprovider
 		weatherEndpoint: "/weather",
-
 		appendLocationNameToHeader: true,
 		calendarClass: "calendar",
 		tableClass: "small",
-
 		onlyTemp: false,
 		showPrecipitationAmount: false,
 		colored: false,
-		showFeelsLike: true
+		showFeelsLike: true,
+		feelsLikeWithDegree: false
 	},
 
 	// Module properties.
@@ -72,11 +71,12 @@ Module.register("weather", {
 
 	// Override getHeader method.
 	getHeader: function () {
-		if (this.config.appendLocationNameToHeader && this.data.header !== undefined && this.weatherProvider) {
-			return this.data.header + " " + this.weatherProvider.fetchedLocation();
+		if (this.config.appendLocationNameToHeader && this.weatherProvider) {
+			if (this.data.header) return this.data.header + " " + this.weatherProvider.fetchedLocation();
+			else return this.weatherProvider.fetchedLocation();
 		}
 
-		return this.data.header;
+		return this.data.header ? this.data.header : "";
 	},
 
 	// Start the weather module.
@@ -88,6 +88,8 @@ Module.register("weather", {
 
 		// Let the weather provider know we are starting.
 		this.weatherProvider.start();
+
+		this.config.feelsLikeWithDegree = this.translate("FEELS").indexOf("{DEGREE}") > -1;
 
 		// Add custom filters
 		this.addFilters();
@@ -123,7 +125,17 @@ Module.register("weather", {
 
 	// Select the template depending on the display type.
 	getTemplate: function () {
-		return `${this.config.type.toLowerCase()}.njk`;
+		switch (this.config.type.toLowerCase()) {
+			case "current":
+				return `current.njk`;
+			case "hourly":
+				return `hourly.njk`;
+			case "daily":
+			case "forecast":
+				return `forecast.njk`;
+			default:
+				return `${this.config.type.toLowerCase()}.njk`;
+		}
 	},
 
 	// Add all the data to the template.
@@ -132,6 +144,7 @@ Module.register("weather", {
 			config: this.config,
 			current: this.weatherProvider.currentWeather(),
 			forecast: this.weatherProvider.weatherForecast(),
+			weatherData: this.weatherProvider.weatherData(),
 			indoor: {
 				humidity: this.indoorHumidity,
 				temperature: this.indoorTemperature
@@ -153,7 +166,9 @@ Module.register("weather", {
 		}
 
 		setTimeout(() => {
-			if (this.config.type === "forecast") {
+			if (this.config.weatherEndpoint === "/onecall") {
+				this.weatherProvider.fetchWeatherData();
+			} else if (this.config.type === "forecast") {
 				this.weatherProvider.fetchWeatherForecast();
 			} else {
 				this.weatherProvider.fetchCurrentWeather();
@@ -205,7 +220,7 @@ Module.register("weather", {
 						}
 					}
 				} else if (type === "precip") {
-					if (isNaN(value) || value === 0 || value.toFixed(2) === "0.00") {
+					if (value === null || isNaN(value) || value === 0 || value.toFixed(2) === "0.00") {
 						value = "";
 					} else {
 						if (this.config.weatherProvider === "ukmetoffice" || this.config.weatherProvider === "ukmetofficedatahub") {
@@ -240,6 +255,13 @@ Module.register("weather", {
 			"calcNumSteps",
 			function (forecast) {
 				return Math.min(forecast.length, this.config.maxNumberOfDays);
+			}.bind(this)
+		);
+
+		this.nunjucksEnvironment().addFilter(
+			"calcNumEntries",
+			function (dataArray) {
+				return Math.min(dataArray.length, this.config.maxEntries);
 			}.bind(this)
 		);
 
